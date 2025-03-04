@@ -58,7 +58,8 @@ function App() {
                         [currentTokenizer]: {
                             decoded: e.data.decoded,
                             margins: e.data.margins,
-                            ids: e.data.ids
+                            ids: e.data.ids,
+                            embeddings: e.data.embeddings
                         }
                     };
                     console.log('[App] New token results:', newResults);
@@ -148,6 +149,27 @@ function App() {
                   </div>
                 ))}
               </div>
+            )}
+            {tokenResults[id]?.embeddings && (
+                <div className="embeddings-visualization">
+                    <h4>Token Embeddings</h4>
+                    <div className="embeddings-grid">
+                        {tokenResults[id].embeddings.map((embedding, idx) => (
+                            <div key={idx} className="embedding-row">
+                                <span className="token">{tokenResults[id].decoded[idx]}</span>
+                                <div className="embedding-values">
+                                    {/* Show first few values of the embedding */}
+                                    {embedding.slice(0, 5).map((value, i) => (
+                                        <span key={i} className="embedding-value">
+                                            {value}
+                                        </span>
+                                    ))}
+                                    <span>...</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             )}
         </div>
       ))}
