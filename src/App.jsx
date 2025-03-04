@@ -3,6 +3,8 @@ import './App.css'
 
 const TOKENIZERS = [
   { id: 'distilbert-base-uncased', name: 'DistilBERT Base Uncased' },
+  { id: 'gpt2', name: 'GPT-2' },
+  { id: 't5-small', name: 'T5-Small' }
 ];
 
 // To start: GPT type (GPT2Tokenizer), BERT type (DistilBertTokenizer), T5 type (T5Tokenizer)
@@ -48,7 +50,7 @@ function App() {
                     return;
                 }
 
-                const currentTokenizer = TOKENIZERS[0].id;
+                const currentTokenizer = e.data.model_id;
                 console.log('[App] Updating results for tokenizer:', currentTokenizer);
                 setTokenResults(prevResults => {
                     const newResults = {
