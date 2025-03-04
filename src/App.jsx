@@ -4,7 +4,8 @@ import './App.css'
 const TOKENIZERS = [
   { id: 'distilbert-base-uncased', name: 'DistilBERT Base Uncased' },
   { id: 'gpt2', name: 'GPT-2' },
-  { id: 't5-small', name: 'T5-Small' }
+  { id: 'llama-68m', name: 'Llama 68M'},
+  { id: 't5-small', name: 'T5-Small' },
 ];
 
 // To start: GPT type (GPT2Tokenizer), BERT type (DistilBertTokenizer), T5 type (T5Tokenizer)
@@ -52,21 +53,30 @@ function App() {
 
                 const currentTokenizer = e.data.model_id;
                 console.log('[App] Updating results for tokenizer:', currentTokenizer);
+                
                 setTokenResults(prevResults => {
                     const newResults = {
                         ...prevResults,
                         [currentTokenizer]: {
+                            ...prevResults[currentTokenizer],  // Preserve any existing data
                             decoded: e.data.decoded,
                             margins: e.data.margins,
                             ids: e.data.ids,
-                            embeddings: e.data.embeddings,
-                            tokenColors: e.data.tokenColors
+                            // Only update embeddings and colors if this is a complete response
+                            ...(e.data.complete ? {
+                                embeddings: e.data.embeddings,
+                                tokenColors: e.data.tokenColors
+                            } : {})
                         }
                     };
                     console.log('[App] New token results:', newResults);
                     return newResults;
                 });
-                setIsLoading(false);
+                
+                // Only set loading to false when we get the complete response
+                if (e.data.complete) {
+                    setIsLoading(false);
+                }
             });
 
             // Initial tokenizer loading
@@ -135,30 +145,30 @@ function App() {
       )}
 
       {TOKENIZERS.map(({ id, name }) => (
-        <div key={id} className="tokenizer-section">
-          <h3 className="model-name">{name}</h3>
-            {tokenResults[id] && (
-              <div className="tokens-list">
-                {tokenResults[id].decoded.map((token, index) => (
-                  <div 
-                    key={index} 
-                    className="token-container"
-                    style={{ marginLeft: tokenResults[id].margins[index] }}
-                  >
-                    <span 
-                      className="token"
-                      style={{
+        tokenResults[id] && (  // Only render if we have results for this tokenizer
+          <div key={id} className="tokenizer-section">
+            <h3 className="model-name">{name}</h3>
+            <div className="tokens-list">
+              {tokenResults[id].decoded.map((token, index) => (
+                <div 
+                  key={index} 
+                  className="token-container"
+                  style={{ marginLeft: tokenResults[id].margins[index] }}
+                >
+                  <span 
+                    className="token"
+                    style={{
                         background: tokenResults[id].tokenColors ? 
-                          `rgb(${tokenResults[id].tokenColors[index].join(',')})` : 
-                          'rebeccapurple'
-                      }}
-                    >{token}</span>
-                    <span className="token-id">{tokenResults[id].ids[index]}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-        </div>
+                            `rgb(${tokenResults[id].tokenColors[index].join(',')})` : 
+                            '#e0e0e0'  // Default color when embeddings aren't ready
+                    }}
+                  >{token}</span>
+                  <span className="token-id">{tokenResults[id].ids[index]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
       ))}
     </div>
   )
