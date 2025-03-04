@@ -59,7 +59,8 @@ function App() {
                             decoded: e.data.decoded,
                             margins: e.data.margins,
                             ids: e.data.ids,
-                            embeddings: e.data.embeddings
+                            embeddings: e.data.embeddings,
+                            tokenColors: e.data.tokenColors
                         }
                     };
                     console.log('[App] New token results:', newResults);
@@ -144,32 +145,18 @@ function App() {
                     className="token-container"
                     style={{ marginLeft: tokenResults[id].margins[index] }}
                   >
-                    <span className="token">{token}</span>
+                    <span 
+                      className="token"
+                      style={{
+                        background: tokenResults[id].tokenColors ? 
+                          `rgb(${tokenResults[id].tokenColors[index].join(',')})` : 
+                          'rebeccapurple'
+                      }}
+                    >{token}</span>
                     <span className="token-id">{tokenResults[id].ids[index]}</span>
                   </div>
                 ))}
               </div>
-            )}
-            {tokenResults[id]?.embeddings && (
-                <div className="embeddings-visualization">
-                    <h4>Token Embeddings</h4>
-                    <div className="embeddings-grid">
-                        {tokenResults[id].embeddings.map((embedding, idx) => (
-                            <div key={idx} className="embedding-row">
-                                <span className="token">{tokenResults[id].decoded[idx]}</span>
-                                <div className="embedding-values">
-                                    {/* Show first few values of the embedding */}
-                                    {embedding.slice(0, 5).map((value, i) => (
-                                        <span key={i} className="embedding-value">
-                                            {value}
-                                        </span>
-                                    ))}
-                                    <span>...</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
             )}
         </div>
       ))}

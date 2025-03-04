@@ -1,4 +1,5 @@
 import { env, AutoTokenizer, pipeline } from '@huggingface/transformers';
+import { PCA } from 'ml-pca';
 
 console.log('[Worker] Initializing worker...');
 
@@ -79,8 +80,24 @@ self.addEventListener('message', async (event) => {
                 reshapedEmbeddings.push(lastLayerEmbeddings.slice(i * 768, (i + 1) * 768));
             }
 
-            console.log('[Worker] Embeddings computed:', reshapedEmbeddings);
+            // Compute PCA
+            const pca = new PCA(reshapedEmbeddings);
+            const pcaOutput = pca.predict(reshapedEmbeddings, { nComponents: 3 });
+
+            // Project to RGB space (0-255) with safer scaling
+            const rgbColors = pcaOutput.to2DArray().map(point => 
+                point.map(val => {
+                    // Use a simpler min-max scaling approach
+                    const min = Math.min(...pcaOutput.to2DArray().flat());
+                    const max = Math.max(...pcaOutput.to2DArray().flat());
+                    const scaled = Math.round(((val - min) / (max - min)) * 255);
+                    return Math.max(0, Math.min(255, scaled));
+                })
+            );
+
+            console.log('[Worker] Embeddings and colors computed:', reshapedEmbeddings, rgbColors);
             response.embeddings = reshapedEmbeddings;
+            response.tokenColors = rgbColors;
         }
 
         console.log('[Worker] Sending results back.');
