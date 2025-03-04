@@ -81,9 +81,9 @@ self.addEventListener('message', async (event) => {
 
         self.postMessage({
             model_id: event.data.model_id,
-            token_ids,
             decoded,
-            margins
+            margins,
+            ids: token_ids
         });
     } catch (error) {
         console.error('[Worker] Error processing message:', error);

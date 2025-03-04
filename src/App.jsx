@@ -57,7 +57,8 @@ function App() {
                         ...prevResults,
                         [currentTokenizer]: {
                             decoded: e.data.decoded,
-                            margins: e.data.margins
+                            margins: e.data.margins,
+                            ids: e.data.ids
                         }
                     };
                     console.log('[App] New token results:', newResults);
@@ -137,13 +138,14 @@ function App() {
             {tokenResults[id] && (
               <div className="tokens-list">
                 {tokenResults[id].decoded.map((token, index) => (
-                  <span 
+                  <div 
                     key={index} 
-                    className="token"
+                    className="token-container"
                     style={{ marginLeft: tokenResults[id].margins[index] }}
                   >
-                    {token}
-                  </span>
+                    <span className="token">{token}</span>
+                    <span className="token-id">{tokenResults[id].ids[index]}</span>
+                  </div>
                 ))}
               </div>
             )}
