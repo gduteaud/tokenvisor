@@ -1,4 +1,4 @@
-import { env, AutoTokenizer, AutoModel } from '@huggingface/transformers';
+import { env, AutoTokenizer, pipeline } from '@huggingface/transformers';
 
 console.log('[Worker] Initializing worker...');
 
@@ -58,19 +58,29 @@ self.addEventListener('message', async (event) => {
         if (model_id === "distilbert-base-uncased") {
             let modelPromise = MODEL_MAPPINGS.get(model_id);
             if (!modelPromise) {
-                console.log(`[Worker] Loading model for: ${model_id}`);
-                modelPromise = AutoModel.from_pretrained("Xenova/distilbert-base-uncased", { dtype: 'q8' });
+                console.log(`[Worker] Loading feature extraction pipeline for: ${model_id}`);
+                modelPromise = pipeline('feature-extraction', 'Xenova/distilbert-base-uncased', {
+                    pooling: false, // Disable pooling to get per-token embeddings
+                    normalize: false // Typically not needed for per-token embeddings
+                });
                 MODEL_MAPPINGS.set(model_id, modelPromise);
             }
 
-            const model = await modelPromise;
-            console.log('[Worker] Model loaded, computing embeddings...');
+            const extractor = await modelPromise;
+            console.log('[Worker] Pipeline loaded, computing embeddings...');
 
-            const tokenized = tokenizer(text);
-            const outputs = await model(tokenized);
-            console.log('[Worker] Model outputs:', outputs);
-            response.embeddings = outputs.logits.tolist();
-            console.log('[Worker] Embeddings:', response.embeddings);
+            const output = await extractor(text);
+            // Get the last layer's embeddings (shape: [batch_size=1, sequence_length, hidden_size=768])
+            const lastLayerEmbeddings = Array.from(output.data).slice(-token_ids.length * 768);
+            
+            // Reshape into [sequence_length, hidden_size]
+            const reshapedEmbeddings = [];
+            for (let i = 0; i < token_ids.length; i++) {
+                reshapedEmbeddings.push(lastLayerEmbeddings.slice(i * 768, (i + 1) * 768));
+            }
+
+            console.log('[Worker] Embeddings computed:', reshapedEmbeddings);
+            response.embeddings = reshapedEmbeddings;
         }
 
         console.log('[Worker] Sending results back.');
