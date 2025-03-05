@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Plot from 'react-plotly.js'
 import './App.css'
+import WorkerModule from './worker?worker'
 
 const TOKENIZERS = [
   { id: 'distilbert-base-uncased', name: 'DistilBERT Base Uncased' },
@@ -32,12 +33,7 @@ function App() {
     if (!worker.current) {
         console.log('[App] Initializing new worker');
         try {
-            const workerUrl = new URL('./worker.js', import.meta.url);
-            console.log('[App] Created worker URL:', workerUrl.href);
-            
-            worker.current = new Worker(workerUrl, {
-                type: 'module'
-            });
+            worker.current = new WorkerModule();
             
             console.log('[App] Worker instance created');
 
