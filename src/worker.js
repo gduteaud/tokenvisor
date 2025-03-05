@@ -124,7 +124,6 @@ self.addEventListener("message", async (event) => {
       return;
     }
 
-    // Existing pipeline-based approach for other models
     let modelPromise = MODEL_MAPPINGS.get(model_id);
     if (!modelPromise) {
       console.log(
@@ -133,9 +132,9 @@ self.addEventListener("message", async (event) => {
 
       // Configure pipeline options based on model
       const pipelineOptions = {
-        pooling: false, // Disable pooling to get per-token embeddings
-        normalize: false, // Typically not needed for per-token embeddings
-        tokenize: false, // Disable internal tokenization
+        pooling: false, // We want per-token embeddings
+        normalize: false,
+        tokenize: false,
       };
 
       // Add specific model file names for different architectures
@@ -192,7 +191,7 @@ self.addEventListener("message", async (event) => {
         const pca = new PCA(reshapedEmbeddings);
         const pcaOutput = pca.predict(reshapedEmbeddings, { nComponents: 3 });
 
-        // Project to RGB space (0-255) with safer scaling
+        // Project to RGB space (0-255)
         rgbColors = pcaOutput.to2DArray().map((point) =>
           point.map((val) => {
             const min = Math.min(...pcaOutput.to2DArray().flat());

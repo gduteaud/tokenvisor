@@ -12,7 +12,6 @@ const TOKENIZERS = [
 // To start: GPT type (GPT2Tokenizer), BERT type (DistilBertTokenizer), T5 type (T5Tokenizer)
 // Specify tokenizer type (WordPiece, SentencePiece, BytePairEncoding)
 
-// Add these constants at the top with your TOKENIZERS
 const MODEL_COLORS = {
   'distilbert-base-uncased': '#ff7f0e',  // orange
   'gpt2': '#1f77b4',  // blue
@@ -124,12 +123,11 @@ function App() {
     });
   }
 
-  // Add this function to prepare the scatter plot data
   const prepareScatterData = () => {
     const scatterData = [];
     
     Object.entries(tokenResults).forEach(([modelId, results]) => {
-      // Skip T5 models
+      // Skip T5
       if (modelId === 't5-small') return;
       
       if (results.tokenColors && results.tokenColors.length > 0) {
@@ -229,7 +227,6 @@ function App() {
         )
       ))}
 
-      {/* Add this after the tokenizer sections */}
       {Object.keys(tokenResults).length > 0 && (
         <div className="embeddings-visualization">
           <Plot
@@ -241,8 +238,8 @@ function App() {
               paper_bgcolor: '#242424',
               plot_bgcolor: '#242424',
               legend: {
-                x: 0,      // Move to left side (0 is left, 1 is right)
-                xanchor: 'left',  // Anchor point on the left
+                x: 0,
+                xanchor: 'left',
                 bgcolor: '#242424',
                 font: { color: '#fff' }
               },
