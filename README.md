@@ -1,14 +1,16 @@
 # TokenVisor
 
+Try it here: https://gduteaud.github.io/tokenvisor/
+
 This is a simple little tool to visually explore how large language models tokenize and embed input text. It is in part inspired by [The Tokenizer Playground](https://huggingface.co/spaces/Xenova/the-tokenizer-playground), but this version shows the outputs of multiple models concurrently for easier comparison and also includes an embedding step.
 
 ## What's the point of doing this?
 
-I think LLMs are fascinating, I think it's important to understand how they work, and I'm a very visual person so I mainly undertook this to satisfy my own curiosity.
+I find LLMs fascinating, I think it's important to understand how they work, and I'm a very visual person so I mainly undertook this to satisfy my own curiosity.
 
 For example I think it's interesting to look at the differences in how models break down the following text. We can see that all three models assign similar meaning to "forest" and "beach" but beyond that they each group tokens/words slightly differently (should we go to/the/forest/or/the/beach/today, should/we go/to the forest/or/the beach today, should we go to the/forest/or the/beach/today). We can also see how a given word/token can be given a different embedding, thanks to positional encoding and attention*. This is true in all 3 models for the two instances of "the", but is particularly apparent in Llama.
 
-*I'm working on some other tools to also visualize these mechanisms
+*I'm also working on some other tools to help visualize these mechanisms
 
 ![Screen capture of the tool's colour-coded textual output for the input text "Hello! Should we go to the forest or the beach today?"](/src/assets/example_tokens.png)
 
@@ -20,7 +22,7 @@ This tool takes the input text and runs it through each model's tokenizer to dis
 
 These embeddings are high-dimensional (768+) vectors. We can't easily visualize those directly so we apply principal component analysis (PCA), a dimensionality reduction technique, to project those vectors to 3 dimensions. We then map that to the RGB colour space and display the resulting colour as a background to each token. This is a convenient, if crude, way for us to visualize the kinds of semantic relationships these models "understand" in text.
 
-We also display each of these tokens as a point in a 3D scatter plot. We plot the outputs of all 3 models in the same graph for convenience but it's important to note that relationships between the outputs of different models on that graph are not meaningful. Because we apply PCA separately to the outputs of each model, the axes effectively correspond to different features ("meanings") for each model. This is why the outputs of each model cluster so neatly. Still, it's interesting to look at the relationships between tokens for the same model in this 3D space (you can toggle each model on and off by clicking it in the legend).
+We also display each of these tokens as a point in a 3D scatter plot. We plot the outputs of all 3 models in the same graph for convenience but it's important to note that **relationships between the outputs of different models on that graph are not meaningful**. Because we apply PCA separately to the outputs of each model, the axes effectively correspond to different features ("meanings") for each model. This is why the outputs of each model cluster so neatly. Still, it's interesting to look at the relationships between tokens for the same model in this 3D space (you can toggle each model on and off by clicking it in the legend).
 
 ![Screen capture of the tool's colour-coded scatter plot output for the input text "Hello! Should we go to the forest or the beach today?"](/src/assets/example_plot.png)
 
